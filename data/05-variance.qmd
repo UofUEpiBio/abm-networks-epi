@@ -1,0 +1,177 @@
+---
+format: html
+---
+
+
+```{r}
+#| label: setup
+#| echo: false
+library(data.table)
+library(ggplot2)
+
+# Reading the simulation data
+simstats <- fread("data/02-dataprep-network-stats.csv.gz")
+
+# Making val fancy
+vallabs <- c(
+  peak_time = "Peak time",
+  peak_preval = "Peak prevalence",
+  rt = "Reproductive number",
+  rt_mean = "Average reproductive number",
+  dispersion = "Dispersion",
+  gentime = "Generation time",
+  final_preval = "Final prevalence"
+)
+
+# Mapping the nettype to a more readable name
+simstats[, nettype := factor(
+  nettype,
+  levels = c("ergm", "sf", "swp01", "swp02", "degseq", "er"),
+  labels = c("ERGM", "Scale-free", "Small-world (p=0.1)", "Small-world (p=0.2)", "Degree-sequence", "Erdos-Renyi")
+  )]
+
+nsamples <- 1000L
+set.seed(777)
+```
+
+# Analyzing variance 
+
+```{r}
+#| label: fun-def
+#| echo: false
+bootvar <- function(var, nsamples = 1000) {
+  # Identifying the index of each nettype
+  ntype <- sort(unique(simstats$nettype))
+  res <- NULL
+  for (n in ntype) {
+
+    # Subsetting the data
+    value <- simstats[nettype == n, .SD[[1]], .SDcols = var]
+
+    # Sampling w/ replacement
+    value_samples <- matrix(
+      sample(value, nsamples * length(value), replace = TRUE), 
+      nrow = nsamples, ncol = length(value), byrow = TRUE
+    )
+
+    # Keeping finite only
+    value_samples[!is.finite(value_samples)] <- NA
+
+    # Computing the variance
+    value_var <- apply(value_samples, 1, stats::var, na.rm = TRUE) 
+    
+    # Saving the results
+    res <- rbind(
+      res,
+      data.table(nettype = n, var = value_var)
+      )
+
+    # message("Finished nettype ", n)
+
+  }
+
+  return(res)
+}
+```
+
+::: {.panel-tabset}
+
+## Peak time
+
+```{r}
+#| label: peak_time
+#| echo: false
+# Generating pretty labels for nettypes
+res <- bootvar("peak_time", nsamples)
+
+# Visualizing the results with ggplot2
+ggplot(res, aes(x = nettype, y = var)) +
+  geom_boxplot() +
+  # Rotating 45 degrees the xlabs
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  # scale_fill_brewer(palette = "Set1") +
+  labs(
+    x = "Network type", y = "Variance of\npeak time",
+    # title = "Variance of peak time by network type",
+    # subtitle = sprintf("Bootstrap sampling (n=%d)", nsamples)
+    ) 
+
+# Saving the figure in 8 x 8 in
+ggsave("figures/05-variance-peak-time.png", width = 8, height = 6, scale = .75)
+```
+
+## Peak prevalence
+
+```{r}
+#| label: peak_preval
+#| echo: false
+# Generating pretty labels for nettypes
+res <- bootvar("peak_preval", nsamples)
+
+# Visualizing the results with ggplot2
+ggplot(res, aes(x = nettype, y = var)) +
+  geom_boxplot() +
+  # Rotating 45 degrees the xlabs
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    x = "Network type", y = "Variance of\npeak prevalence",
+    # title = "Variance of peak prevalence by network type",
+    # subtitle = sprintf("Bootstrap sampling (n=%d)", nsamples)
+    ) 
+
+# Saving the figure in 8 x 8 in
+ggsave("figures/05-variance-peak-preval.png", width = 8, height = 6, scale = .75)
+```
+
+
+## Reproductive number
+
+```{r}
+#| label: rt
+#| echo: false
+# Generating pretty labels for nettypes
+res <- bootvar("rt_0", nsamples)
+
+# Visualizing the results with ggplot2
+ggplot(res, aes(x = nettype, y = var)) +
+  geom_boxplot() +
+  # Rotating 45 degrees the xlabs
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    x = "Network type", y = "Variance of\nreproductive number",
+    # title = "Variance of reproductive number by network type",
+    # subtitle = sprintf("Bootstrap sampling (n=%d)", nsamples)
+    ) 
+
+# Saving the figure in 8 x 8 in
+ggsave("figures/05-variance-rt.png", width = 8, height = 6, scale = .75)
+```
+
+## Generation time
+
+```{r}
+#| label: gentime
+#| echo: false
+
+
+
+
+# Generating pretty labels for nettypes
+res <- bootvar("gentime", nsamples)
+
+# Visualizing the results with ggplot2
+ggplot(res, aes(x = nettype, y = var)) +
+  geom_boxplot() +
+  # Rotating 45 degrees the xlabs
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    x = "Network type", y = "Variance of\ngeneration time",
+    # title = "Variance of generation time by network type",
+    # subtitle = sprintf("Bootstrap sampling (n=%d)", nsamples)
+    )
+
+# Saving the figure in 8 x 8 in
+ggsave("figures/05-variance-gentime.png", width = 8, height = 6, scale = .75)
+```
+
+:::

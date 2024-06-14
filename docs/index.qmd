@@ -1,0 +1,350 @@
+---
+title: 'How Network Structure Affects Epidemiological Indicators in ABMs'
+subtitle: '<text style="font-size: 120%;">A Large Simulation Study Featuring Artificial and Real-world Networks</text><br><br>Sunbelt 2023<br>Portland, Oregon'
+author: 
+  - '**George G. Vega Yon**'
+  - Chong Zhang
+  - Alun Thomas
+  - Matthew Samore
+  - Karim Khader
+aspectratio: 169
+date: 2023-06-28
+format:
+  revealjs:
+    slide-number: true
+    footer: Vega Yon et al -- ggv.cl/slides/sunbelt2023 -- The University of Utah
+    theme: ["default", "style.scss"]
+    title-slide-attributes: 
+      data-background-image: 'Zoom-Background_PrideU.jpg'
+      data-background-opacity: '0.2'
+      data-background-size: 'contain'
+    fig-align: center
+    embed-resources: true
+    mermaid-format: png
+---
+
+# Motivation {background-color="#890000"}
+
+## *R$_t$* in Small World Networks[^fnd] 
+
+[^fnd]: Work supported by the Centers for Disease Control and Prevention; Award number 1U01CK000585; 75D30121F00003.
+
+::: {.columns}
+::: {.column .fragment .fade-up width="45%"}
+
+
+
+![Herd Immunity Threshold vs Reproductive Number [(Wikipedia)](https://commons.wikimedia.org/wiki/File:Herd_immunity_threshold_vs_r0.svg)](data/figures/Herd_immunity_threshold_vs_r0.svg){width=70%}
+
+- *R$_t$* > 1: Epidemic grows.
+- *R$_t$* < 1: Epidemic shrinks.
+:::
+
+::: {.column .fragment .fade-up width="45%"}
+
+But...
+
+![](data/small-world-example.png){width=70%}
+
+The reproduction number in a **SIR + small-world network is, on average, $<$ 1**!
+
+::: 
+:::
+
+## Our goal {background-image="data/figures/us-airports.png" background-opacity=".15" background-size="50%" background-position="bottom 70% right 50px"}
+
+::: {style="font-size: 120%"}
+
+::: {.fragment}
+- Agent-Based Models \[ABMs\] are an important research and policy tool in epidemiology.
+:::
+
+::: {.fragment}
+- ABMs usually feature random graphs, often using 'simple models' such as scale-free graphs.
+:::
+
+::: {.fragment}
+- But, **real-world networks are not random**.
+:::
+
+::: {.fragment}
+- Although we understand the latter, the question is: How much does it matter?
+:::
+
+::: {.fragment style="font-size: 120%; text-align: center; color: #890000; bottom: 20px; position: absolute" }
+We aim to shed light on how **network structure** affects **epidemiological measurements** to inform ABMs better.
+:::
+
+:::
+
+# Simulation Study {background-color="#890000"}
+
+## Simulation study<br>*Networks with different structures*
+
+Six different network models featuring almost (almost) the same density
+
+<!-- ::: {}  -->
+
+![](graph-drawings-edited.svg){fig-align="center" style="width: 60%"}
+
+We generated 1,000 networks for each model, using the ERGM as a baseline.
+
+<!-- ::: -->
+
+## Simulation study<br>*Outbreaks with different networks*
+
+We simulated 20,000 Susceptible-Exposed-Infected-Recovered \[SEIR\] outbreaks using the [*epiworldR*](https://github.com/UofUEpiBio/epiworldR){target="_blank"} package:
+
+::: {sytle="width: 60%; text-align: center; margin: auto; font-size: 120%"}
+
+```{mermaid}
+graph LR
+    A[Susceptible] --> B[Exposed]
+    B --> C[Infected]
+    C --> D[Recovered]
+```
+
+:::
+
+
+::: {.fragment}
+1. Sampled a network out of the six types.
+:::
+
+::: {.fragment}
+2. For each network (with **534** nodes and avg. degree of ~**14**), we simulated an SEIR outbreak:
+:::
+
+::: {.fragment}
+<!-- Adding a tab HTML -->
+&nbsp;&nbsp;&nbsp;a. Starts with **one** exposed node.
+:::
+
+::: {.fragment}
+&nbsp;&nbsp;&nbsp;b. Exposed nodes transmit the disease to their neighbors at a daily rate of **0.023**.[^tratecomputation]
+:::
+::: {.fragment}
+&nbsp;&nbsp;&nbsp;c. Infected nodes recover at a daily rate of **1/7**.
+:::
+::: {.fragment}
+&nbsp;&nbsp;&nbsp;d. For **100** days.
+:::
+
+
+<!-- $RepNum = C_{rate} \times p_t\sum_{k = 0}(1 - p_r)(1 - p_t) = \frac{C_rate}{1 - (1 - p_r)(1 - p_t)}p_t$
+
+RepNum = 2 and $p_r = 1/7$
+
+Therefore, -->
+
+[^tratecomputation]: To calculate the transmission rate, we use the following formula: $p_t = \frac{p_r}{(C/R + p_r - 1)}$, with C = 14, R = 2, and $p_r = 1/7$
+
+## Simulation study<br>*Network and outbreak statistics*
+
+::: {.columns}
+
+::: {.column width=50% .fragment}
+
+Epi measurements
+
+![](data/figures/diagrams-stats.svg){width=100%}
+
+:::
+
+::: {.column width=50% style="font-size: 90%" .fragment}
+
+For each network, we computed:
+
+::: {.fragment}
+- Edge count and density.
+:::
+::: {.fragment}
+- \# of Balanced triads.
+:::
+::: {.fragment}
+- \# of homophilic ties (grade and gender).
+:::
+::: {.fragment}
+- \# of triangles.
+:::
+::: {.fragment}
+- \# of two paths.
+:::
+::: {.fragment}
+- Avg. betweenness,  closeness centrality, and eigenvector centrality.
+:::
+::: {.fragment}
+- Avg. path length.
+:::
+::: {.fragment}
+- Modularity.
+:::
+
+:::
+:::
+
+# Preliminary results {background-color="#890000"}
+
+## Network features
+
+![](data/figures/03-report-ergm-vars.png){fig-align="center"}
+
+## Network features (cont.)
+
+![](data/figures/03-report-igraph-vars.png){fig-align="center"}
+
+## Overall distribution of epidemiological measurements
+
+![](data/figures/03-report-pairwise.png){fig-align="center"}
+
+## *Rt* curve
+
+![](data/figures/04-repnums-rt-by-nettype.png){fig-align="center"}
+
+## Variance: Reproductive number
+
+Using 1,000 bootstrap samples, we computed the variance of the reproductive number for each network type.
+
+![](data/figures/05-variance-rt.png){fig-align="center"}
+
+## Variance: Peak time
+
+![](data/figures/05-variance-peak-time.png){fig-align="center"}
+
+## Variance: Peak prevalence
+
+![](data/figures/05-variance-peak-preval.png){fig-align="center"}
+
+## Variance: Generation time
+
+![](data/figures/05-variance-gentime.png){fig-align="center"}
+
+# Predicting epidemiological measurements {background-color="#890000"}
+
+## Regression analysis
+
+<!--
+#e41a1c
+#377eb8
+#4daf4a
+#984ea3
+-->
+
+```{r}
+#| echo: false
+colo <- function(...) {
+  sprintf(
+    '<text style="color: #%s;font-weight: bold">%s</text>',
+    gsub("'", "", as.character(match.call()[[3]])),
+    gsub("'", "", as.character(match.call()[[2]]))
+  )
+}
+
+Rt <- colo('Rt', 'e41a1c')
+Gt <- colo('Gen time', '377eb8')
+Pt <- colo('Peak time', '4daf4a')
+Pp <- colo('Peak preval', '984ea3')
+
+# colo(R, fff)
+```
+
+Regressed *`r Rt`*, *`r Gt`*, *`r Pt`*, and *`r Pp`* on network features (n = 18,015)
+
+::: {.columns style="font-size: 85%;"}
+
+::: {.column width="30%"}
+::: {.fragment}
+- Avg. degree {{< fa regular hand-point-up >}} `r Pt` and {{< fa regular hand-point-down >}} `r Gt`.
+:::
+
+::: {.fragment}
+- Higher number of two-paths {{< fa regular hand-point-down >}} `r Pt` and `r Rt`, but {{< fa regular hand-point-up >}} the `r Pp` (more severe).
+:::
+
+::: {.fragment}
+- Transitivity {{< fa regular hand-point-down >}} `r Pp` and {{< fa regular hand-point-up >}} `r Gt`.
+:::
+
+::: {.fragment}
+- Triangles {{< fa regular hand-point-up >}} the `r Pt`.
+:::
+
+::: {.fragment}
+- Higher balance significantly {{< fa regular hand-point-up >}} `r Rt`.
+:::
+
+::: {.fragment}
+- Degree-sequence and Erdos-Renyi networks have consistently {{< fa regular hand-point-up >}} `r Pp` and {{< fa regular hand-point-up >}} `r Pt`.
+:::
+
+::: {.fragment}
+- Scale-free networks have {{< fa regular hand-point-down >}} `r Pt` and {{< fa regular hand-point-up >}} `r Rt`.
+:::
+:::
+
+::: {.column width="70%"}
+![](data/figures/03-report-coefficients.png){fig-align="center" width=100%}
+:::
+
+:::
+
+## Discussion
+
+::: {.columns style="font-size: 90%;"}
+
+::: {.column width=40%}
+
+::: {.fragment}
+- In small networks, as $p \to 0$, `r Rt`$\to$ 1.
+:::
+
+::: {.fragment}
+- High heterogeneity in the **variance** of the studied stats,  especially in **scale-free networks**.
+:::
+
+::: {.fragment}
+- We captured part of the heterogeneity as a function of *degree*, *two paths*, *transitivity*, *triangles*, and *balance*.
+:::
+
+::: {.fragment}
+- Yet the model does not capture some properties of Erdos-Renyi and degree-sequence networks (higher prevalence and later peak-time).
+:::
+
+::: {.fragment}
+- `r Rt` is hard to predict as a function of network structure.
+:::
+
+::: {.fragment}
+- Our study only looks at small networks. We need to dive deep into large network models.
+:::
+
+:::
+
+::: {.column width=60%}
+
+![](data/figures/04-repnums-rt-by-nettype.png){fig-align="center"}
+
+::: {.fragment style="text-align: center; font-size: 120%"}
+### Thanks!
+
+george.vegayon at utah.edu
+
+[**https://ggv.cl**](https://ggvy.cl){target="_blank"}
+
+[{{< fa brands twitter >}} @gvegayon](https://twitter.com/gvegayon){target="_blank"}
+:::
+:::
+
+:::
+
+## Bonus
+
+::: {style="font-size:70%"}
+
+```{r}
+#| results: asis
+#| echo: false
+cat(readLines("data/03-report-regression.html"), sep = "\n")
+```
+
+:::

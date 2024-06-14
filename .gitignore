@@ -6,3 +6,5 @@ slides_files
 *.out
 *.sh
 .Rhistory
+
+/.luarc.json

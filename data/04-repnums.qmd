@@ -1,0 +1,39 @@
+---
+format: html
+---
+
+
+```{r}
+#| echo: false
+library(data.table)
+repnums <- fread("data/03-rt-data.csv.gz")
+
+repnums[, nettype := factor(
+  nettype,
+  levels = c("ergm", "sf", "swp01", "swp02", "degseq", "er"),
+  labels = c("ERGM", "Scale-free", "Small-world (p=0.1)", "Small-world (p=0.2)", "Degree-sequence", "Erdos-Renyi")
+  )]
+
+# Collapsing my network type my date (average)
+averages <- repnums[, .(Rt = mean(avg)), by = c("date", "nettype")]
+averages <- averages[date <= 50]
+
+
+
+library(ggplot2)
+ggplot(averages, aes(x = date, y = Rt)) +
+  scale_color_brewer(palette = "Set1") +
+  geom_line(aes(color = nettype), size = 1.5) +
+  labs(
+    title    = "Average Rt by Network Type",
+    subtitle = sprintf(
+      "Looking across %s simulations",
+      prettyNum(length(unique(repnums$simid)), big.mark = ",")
+    ),
+    x = "Date",
+    y = "Rt",
+    colour = "Network Type"
+  )
+
+ggsave("data/figures/04-repnums-rt-by-nettype.png", width = 8, height = 4, units = "in")
+```
