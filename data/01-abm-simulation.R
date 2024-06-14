@@ -35,7 +35,9 @@ incubation_days    <- 7
 recovery_rates     <- 1/7
 contact_rates      <- 14 # Average observed
 reproductive       <- 2
-transmission_rates <- recovery_rates/(contact_rates/reproductive + recovery_rates - 1) # Analytical sol
+transmission_rates <- recovery_rates/(
+  contact_rates/reproductive + recovery_rates - 1
+  ) # Analytical sol
 
 
 # Group infectiousness and recovery_rate into a list of length

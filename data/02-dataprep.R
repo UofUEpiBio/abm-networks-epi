@@ -184,24 +184,24 @@ if (!file.exists(fn_sim)) {
 
       # Return a data.table
       data.table(
-        simfile           = fn,
-        simid             = x$simid,
-        peak_time         = peak_time,
-        peak_preval       = peak_preval,
-        rt                = rt,
-        rt_mean           = r_mean,
-        rt_0              = rt_0,
-        rt_1              = rt_1,
-        rt_2              = rt_2,
-        rt_3              = rt_3,
-        rt_4              = rt_4,
-        rt_5              = rt_5,
-        dispersion        = dispersion,
-        gentime           = gentime,
-        final_preval      = final_preval,
-        transmission_rate = x$param$transmission_rate,
-        inc_days          = x$param$inc_days,
-        recovery_rate     = x$param$recovery_rate
+        simfile           = if (length(fn)) fn else NA,
+        simid             = if (length(x$simid)) x$simid else NA,
+        peak_time         = if (length(peak_time)) peak_time else NA,
+        peak_preval       = if (length(peak_preval)) peak_preval else NA,
+        rt                = if (length(rt)) rt else NA,
+        rt_mean           = if (length(r_mean)) r_mean else NA,
+        rt_0              = if (length(rt_0)) rt_0 else NA,
+        rt_1              = if (length(rt_1)) rt_1 else NA,
+        rt_2              = if (length(rt_2)) rt_2 else NA,
+        rt_3              = if (length(rt_3)) rt_3 else NA,
+        rt_4              = if (length(rt_4)) rt_4 else NA,
+        rt_5              = if (length(rt_5)) rt_5 else NA,
+        dispersion        = if (length(dispersion)) dispersion else NA,
+        gentime           = if (length(gentime)) gentime else NA,
+        final_preval      = if (length(final_preval)) final_preval else NA,
+        transmission_rate = if (length(x$param$transmission_rate)) x$param$transmission_rate else NA,
+        inc_days          = if (length(x$param$inc_days)) x$param$inc_days else NA,
+        recovery_rate     = if (length(x$param$recovery_rate)) x$param$recovery_rate else NA
       )
     }, error=function(e) e)
 
